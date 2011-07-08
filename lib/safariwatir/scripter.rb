@@ -439,7 +439,7 @@ if (element.click) {
     end
   
     def click_link(element = @element)      
-      click = %/
+      click = <<-JS
 function baseTarget() {
   var bases = document.getElementsByTagName('BASE');
   if (bases.length > 0) {
@@ -467,12 +467,17 @@ function nextLocation(element) {
 var click = DOCUMENT.createEvent('HTMLEvents');
 click.initEvent('click', true, true);
 if (element.onclick) {
- 	if (false != element.onclick(click)) {
+  try {
+   	if (false != element.onclick(click)) {
+  		nextLocation(element);
+  	}
+  } catch(e) {
 		nextLocation(element);
-	}
+  }
 } else {
 	nextLocation(element);
-}/
+}
+JS
       page_load do
         execute(js.operate(find_link(element), click))
       end

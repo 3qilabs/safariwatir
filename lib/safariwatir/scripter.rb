@@ -401,20 +401,13 @@ element.setSelectionRange(element.value.length, element.value.length);
       file_base_name = File.basename(value)
       click_element(element)
       sleep 0.4
+      Appscript.app("Safari").activate
       se = Appscript.app("System Events")
-      open_popup = se.processes["Safari"].windows[1].sheets[1]
-      choose_button = open_popup.buttons[1]
-      search_field = open_popup.groups[1].text_fields[1]
-      search_by_file_name = open_popup.groups[1].splitter_groups[1].radio_groups[1].checkboxes[6]
-      sr_outline = open_popup.groups[1].splitter_groups[1].scroll_areas[2].outlines[1]
-      confirm_search_action = search_field.actions[2].get    
-      search_field.value.set(file_base_name)
-      search_field.perform(confirm_search_action)
-      sleep 2
-      search_by_file_name.click
-      sleep 1
-      sr_outline.rows[1].select
-      choose_button.click
+      se.keystroke(value) # should be absolute posix path with leading '/'
+      sleep 0.5
+      se.key_code(52) #return
+      sleep 0.5
+      se.key_code(52) #return
     end
 
     def click_element(element = @element)

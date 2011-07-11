@@ -173,6 +173,7 @@ if (element) {
     
     def find_cell(cell)
       return %|getElementById('#{cell.what}')| if cell.how == :id
+      return %|findAllMatching(document, ExactValueMatcher('#{cell.what}'))[0]| if cell.how == :text
       raise RuntimeError, "Unable to use #{cell.how} to find TableCell" unless cell.row
 
       finder = 

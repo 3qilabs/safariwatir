@@ -471,7 +471,7 @@ module Watir
     end
     
     class TableRow < ContentElement
-      def initialize(scripter, how, what, table = nil)
+      def initialize(parent, scripter, how, what, table = nil)
         @scripter = scripter
         @how = how
         @what = what
@@ -498,7 +498,7 @@ module Watir
     end
     
     class TableCell < ContentElement
-      def initialize(scripter, how, what, row = nil)
+      def initialize(parent, scripter, how, what, row = nil)
         @scripter = scripter.for_table(self)
         set_slow_speed # TODO: Need to inherit this somehow
 

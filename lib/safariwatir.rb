@@ -132,6 +132,7 @@ module Watir
         @scripter.element_exists?(self)
       end
       alias :exist? :exists?
+      alias :visible? :exists?
       
       def element_name
         self.class.name.split("::").last

@@ -470,7 +470,7 @@ if (element.click) {
           }
         } else {
           var oEvent = document.createEvent( "MouseEvents");
-          oEvent.initMouseEvent("click",true,true,window,1,1,1,1,1,false,false,false,false,0,element);
+          oEvent.initMouseEvent('click',true,true,null,1,0,0,0,0,false,false,false,false,0,null);
           if (element.dispatchEvent(oEvent)) {
           } else {
             nextLocation(element);

@@ -460,7 +460,10 @@ if (element.click) {
         }
         var click = DOCUMENT.createEvent('HTMLEvents');
         click.initEvent('click', true, true);
-        if (element.onclick) {
+        var oEvent = document.createEvent( "MouseEvents");
+        oEvent.initMouseEvent('click',true,true,null,1,0,0,0,0,false,false,false,false,0,null);
+        if (element.dispatchEvent(oEvent)) {
+        } else if (element.onclick) {
           try {
             if (false != element.onclick(click)) {
               nextLocation(element);
@@ -469,12 +472,7 @@ if (element.click) {
             nextLocation(element);
           }
         } else {
-          var oEvent = document.createEvent( "MouseEvents");
-          oEvent.initMouseEvent('click',true,true,null,1,0,0,0,0,false,false,false,false,0,null);
-          if (element.dispatchEvent(oEvent)) {
-          } else {
-            nextLocation(element);
-          }
+          nextLocation(element);
         }
         /
       page_load do

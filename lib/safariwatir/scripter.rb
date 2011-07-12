@@ -433,45 +433,50 @@ if (element.click) {
     end
   
     def click_link(element = @element)      
-      click = <<-JS
-function baseTarget() {
-  var bases = document.getElementsByTagName('BASE');
-  if (bases.length > 0) {
-    return bases[0].target;
-  } else {
-    return;
-  }
-}
-function undefinedTarget(target) {
-  return target == undefined || target == '';
-}
-function topTarget(target) {
-  return undefinedTarget(target) || target == '_top';
-}
-function nextLocation(element) {
-  var target = element.target;
-  if (undefinedTarget(target) && baseTarget()) {
-    top[baseTarget()].location = element.href;
-  } else if (topTarget(target)) {
-    top.location = element.href;
-  } else {
-    top[target].location = element.href;    
-  }
-}
-var click = DOCUMENT.createEvent('HTMLEvents');
-click.initEvent('click', true, true);
-if (element.onclick) {
-  try {
-   	if (false != element.onclick(click)) {
-  		nextLocation(element);
-  	}
-  } catch(e) {
-		nextLocation(element);
-  }
-} else {
-	nextLocation(element);
-}
-JS
+      click = %/
+        function baseTarget() {
+          var bases = document.getElementsByTagName('BASE');
+          if (bases.length > 0) {
+            return bases[0].target;
+          } else {
+            return;
+          }
+        }
+        function undefinedTarget(target) {
+          return target == undefined || target == '';
+        }
+        function topTarget(target) {
+          return undefinedTarget(target) || target == '_top';
+        }
+        function nextLocation(element) {
+          var target = element.target;
+          if (undefinedTarget(target) && baseTarget()) {
+            top[baseTarget()].location = element.href;
+          } else if (topTarget(target)) {
+            top.location = element.href;
+          } else {
+            top[target].location = element.href;    
+          }
+        }
+        var click = DOCUMENT.createEvent('HTMLEvents');
+        click.initEvent('click', true, true);
+        if (element.onclick) {
+          try {
+            if (false != element.onclick(click)) {
+              nextLocation(element);
+            }
+          } catch(e) {
+            nextLocation(element);
+          }
+        } else {
+          var oEvent = document.createEvent( "MouseEvents");
+          oEvent.initMouseEvent("click",true,true,window,1,1,1,1,1,false,false,false,false,0,element);
+          if (element.dispatchEvent(oEvent)) {
+          } else {
+            nextLocation(element);
+          }
+        }
+        /
       page_load do
         execute(js.operate(find_link(element), click))
       end

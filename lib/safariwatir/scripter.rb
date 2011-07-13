@@ -431,53 +431,77 @@ if (element.click) {
 }| })
       end
     end
+    
+    def calculate_offset(element = @element)
+      execute(element.operate {%|
+      curLeft = 0;
+      curTop = 0;
+      do {
+        curLeft += element.offsetLeft;
+        curTop += element.offsetTop;
+      } while (element = element.offsetParent);
+      return (curLeft + "," + curTop);
+      |}, element) 
+    end
+    private :calculate_offset
   
-    def click_link(element = @element)      
-      click = %/
-        function baseTarget() {
-          var bases = document.getElementsByTagName('BASE');
-          if (bases.length > 0) {
-            return bases[0].target;
-          } else {
-            return;
-          }
-        }
-        function undefinedTarget(target) {
-          return target == undefined || target == '';
-        }
-        function topTarget(target) {
-          return undefinedTarget(target) || target == '_top';
-        }
-        function nextLocation(element) {
-          var target = element.target;
-          if (undefinedTarget(target) && baseTarget()) {
-            top[baseTarget()].location = element.href;
-          } else if (topTarget(target)) {
-            top.location = element.href;
-          } else {
-            top[target].location = element.href;    
-          }
-        }
-        var click = DOCUMENT.createEvent('HTMLEvents');
-        click.initEvent('click', true, true);
-        var oEvent = document.createEvent( "MouseEvents");
-        oEvent.initMouseEvent('click',true,true,null,1,0,0,0,0,false,false,false,false,0,null);
-        if (element.dispatchEvent(oEvent)) {
-        } else if (element.onclick) {
-          try {
-            if (false != element.onclick(click)) {
-              nextLocation(element);
-            }
-          } catch(e) {
-            nextLocation(element);
-          }
-        } else {
-          nextLocation(element);
-        }
-        /
-      page_load do
-        execute(js.operate(find_link(element), click))
-      end
+    def click_link(element = @element)
+      @app.activate
+      # set the bounds of the first window to {0, 0, 1160, 775}
+      @app.windows[1].bounds.set([0, 0, 1160, 775])
+      offset_left, offset_top = calculate_offset.split(",")
+      mac_menu_bar = 20
+      safari_ui = 78
+      click_offset = 5
+      click_x = offset_left.to_i+click_offset
+      click_y = offset_top.to_i + mac_menu_bar + safari_ui + click_offset
+      Appscript.app("System Events").processes["Safari"].click(:at => [click_x, click_y])
+      
+      # click = %/
+      #   function baseTarget() {
+      #     var bases = document.getElementsByTagName('BASE');
+      #     if (bases.length > 0) {
+      #       return bases[0].target;
+      #     } else {
+      #       return;
+      #     }
+      #   }
+      #   function undefinedTarget(target) {
+      #     return target == undefined || target == '';
+      #   }
+      #   function topTarget(target) {
+      #     return undefinedTarget(target) || target == '_top';
+      #   }
+      #   function nextLocation(element) {
+      #     var target = element.target;
+      #     if (undefinedTarget(target) && baseTarget()) {
+      #       top[baseTarget()].location = element.href;
+      #     } else if (topTarget(target)) {
+      #       top.location = element.href;
+      #     } else {
+      #       top[target].location = element.href;    
+      #     }
+      #   }
+      #   var click = DOCUMENT.createEvent('HTMLEvents');
+      #   click.initEvent('click', true, true);
+      #   var oEvent = document.createEvent( "MouseEvents");
+      #   oEvent.initMouseEvent('click',true,true,null,1,0,0,0,0,false,false,false,false,0,null);
+      #   if (element.dispatchEvent(oEvent)) {
+      #   } else if (element.onclick) {
+      #     try {
+      #       if (false != element.onclick(click)) {
+      #         nextLocation(element);
+      #       }
+      #     } catch(e) {
+      #       nextLocation(element);
+      #     }
+      #   } else {
+      #     nextLocation(element);
+      #   }
+      #   /
+      # page_load do
+      #   execute(js.operate(find_link(element), click))
+      # end
     end
 
     def click_link_jquery(element = @element)      

@@ -1,3 +1,4 @@
+require 'appscript'
 require 'watir/exceptions'
 require 'safariwatir/scripter'
 require 'safariwatir/core_ext'
@@ -916,6 +917,27 @@ module Watir
       safari = new
       safari.goto(url) if url
       safari
+    end
+
+    # Only supports :url for now
+    def self.attach(how, what)
+      case how
+      when :url
+        self.attach_by_url(what)
+      end
+    end
+
+    def self.attach_by_url(pattern)
+      # Iterate through the open windows and activate the one that matches the given URL pattern
+      safari = Appscript.app("Safari")
+      window_count = safari.windows.count
+      for i in 1..safari.windows.count do
+        w = safari.windows[i]
+        if URI.decode(w.document.URL.get).match(pattern)
+          w.index.set(1)
+          break
+        end
+      end
     end
     
     def initialize

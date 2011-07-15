@@ -919,27 +919,39 @@ module Watir
       safari
     end
 
-    # Only supports :url for now
-    def self.attach(how, what)
-      case how
-      when :url
-        self.attach_by_url(what)
-      end
-    end
-
-    def self.attach_by_url(pattern)
-      # Iterate through the open windows and activate the one that matches the given URL pattern
-      safari = Appscript.app("Safari")
-      window_count = safari.windows.count
-      for i in 1..safari.windows.count do
-        w = safari.windows[i]
-        if URI.decode(w.document.URL.get).match(pattern)
-          w.index.set(1)
-          break
+    class << self
+      def attach(how, what)
+        case how
+        when :title
+          attach_by_title(what)
+        when :url
+          attach_by_url(what)
         end
       end
+
+      def attach_by_url(pattern)
+        activate_matching_window(:url, pattern) { |window| URI.decode(window.document.URL.get).match(pattern) }
+      end
+
+      def attach_by_title(pattern)
+        activate_matching_window(:title, pattern) { |window| URI.decode(window.name.get).match(pattern) }
+      end
+
+      def activate_matching_window(how, what)
+        # Iterate through the open windows and activate the one that matches the given pattern
+        safari = Appscript.app("Safari")
+        window_count = safari.windows.count
+        for i in 1..safari.windows.count do
+          window = safari.windows[i]
+          if yield(window)
+            window.index.set(1)
+            break
+          end
+        end
+      end
+      private :activate_matching_window
     end
-    
+
     def initialize
       @scripter = AppleScripter.new(JavaScripter.new)
       @scripter.ensure_window_ready

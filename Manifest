@@ -1,0 +1,15 @@
+Gemfile
+Gemfile.lock
+History.txt
+README.rdoc
+Rakefile
+lib/safariwatir.rb
+lib/safariwatir/core_ext.rb
+lib/safariwatir/element_attributes.rb
+lib/safariwatir/locators.rb
+lib/safariwatir/scripter.rb
+lib/watir/exceptions.rb
+safariwatir.gemspec
+safariwatir_example.rb
+test.rb
+Manifest
